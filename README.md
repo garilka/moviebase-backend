@@ -34,7 +34,7 @@ Backend setup
    export $(grep -v '^#' .env | xargs) && docker run -d --name postgresMoviebaseContainer -p $DB_PORT:5432 -e POSTGRES_PASSWORD=$DB_PASSWORD postgres
 ```
 
-if you run this command outside the moviebase-backend repo the script won't be able to load the .env
+ℹ️ If you run this command outside the moviebase-backend repository the script won't be able to load the .env
 
 5. Create Prisma client
 
