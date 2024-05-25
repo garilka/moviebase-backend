@@ -1,7 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "start": "nodemon --env-file=.env ./src/server.ts",
+    "start": "concurrently \"redis-server\" \"nodemon --env-file=.env ./src/server.ts\"",
+    "start redis": "redis-server",
+    "stop redis": "redis-cli shutdown",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.12",
+    "concurrently": "^8.2.2",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
     "nodemon": "^3.1.0",
