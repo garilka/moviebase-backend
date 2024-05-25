@@ -14,7 +14,7 @@ type FetchExternalMoviesProps = {
 };
 
 const fetchExternalMovies = async ({ search, page = 1 }: FetchExternalMoviesProps): Promise<ExternalMoviesResponse> => {
-  const url = `${config.apiMovieBaseUrl}?api_key=${process.env.API_KEY_AUTH}AA&query=${search}&page=${page}`;
+  const url = `${config.apiMovieBaseUrl}?api_key=${process.env.API_KEY_AUTH}&query=${search}&page=${page}`;
 
   const options = {
     method: 'GET',
