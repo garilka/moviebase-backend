@@ -1,17 +1,22 @@
-import { config } from '../config/config.ts';
+import { redisClient } from '../redisClient.ts';
 import { ExternalMoviesResponse } from '../types/movies.types.ts';
+import { generateQueryString } from './generateQueryString.ts';
 
-export const generateQueryData = (search: string, externalMoviesResponse: ExternalMoviesResponse) => {
+export const generateQueryData = async (
+  search: string,
+
+  externalMoviesResponse: ExternalMoviesResponse,
+) => {
   const { page, total_pages, total_results } = externalMoviesResponse;
-  const cacheMinutes = config.cacheMinute;
-  const currentDate = new Date();
+  const searchQuery = generateQueryString(search, page);
+  const expiredAt = await redisClient.get(searchQuery);
 
   return {
     search,
     page,
     pageCount: total_pages,
     resultCount: total_results,
-    query: `search=${search}&page=${page}`,
-    expiredAt: new Date(currentDate.getTime() + cacheMinutes * 60000), // get from Redis later
+    query: generateQueryString(search, page),
+    expiredAt: expiredAt!,
   };
 };

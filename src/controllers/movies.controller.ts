@@ -1,6 +1,7 @@
 import { CustomError } from '../errors/customErrorClass.ts';
 import { moviesService } from '../services/movies.service.ts';
 import { queriesService } from '../services/queries.service.ts';
+import { generateQueryString } from '../utils/generateQueryString.ts';
 
 type GetExternalMoviesProps = {
   search: string;
@@ -8,7 +9,7 @@ type GetExternalMoviesProps = {
 };
 
 const getExternalMovies = async ({ search, page }: GetExternalMoviesProps) => {
-  const query = `search=${search}&page=${page}`;
+  const query = generateQueryString(search, page);
 
   try {
     const externalApiResponse = await moviesService.fetchExternalMovies({ search, page });

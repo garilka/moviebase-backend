@@ -11,7 +11,7 @@ type CreateQueryInputs = {
 
 const createQuery = async ({ search, externalApiResponse }: CreateQueryInputs): Promise<Query> => {
   try {
-    const queryData = generateQueryData(search, externalApiResponse);
+    const queryData = await generateQueryData(search, externalApiResponse);
 
     return prisma.query.create({
       data: queryData,
