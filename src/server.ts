@@ -1,12 +1,17 @@
 import express, { Express, Request, Response } from 'express';
 import { config } from './config/config.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
+import { redisClient } from './redisClient.ts';
 import { moviesRouter } from './routes/movies.router.ts';
 
 const app: Express = express();
 const port: number = config.port;
 
 app.use(express.json());
+
+(async () => {
+  await redisClient.connect();
+})();
 
 app.get(config.baseUrl, (_req: Request, res: Response) => {
   res.send('Welcome to the moviebase api!');
