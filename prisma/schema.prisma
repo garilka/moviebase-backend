@@ -13,7 +13,7 @@ model Movie {
   originalTitle   String?
   overview        String?
   posterUrl       String?
-  releaseDate     DateTime
+  releaseDate     DateTime?
   genreIds        Int[]
   voteAverage     Decimal?
   rawData         Json
