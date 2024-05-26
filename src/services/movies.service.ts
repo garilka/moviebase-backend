@@ -73,29 +73,6 @@ const updateMovies = async (moviesToUpdate: Prisma.MovieUpdateInput[]): Promise<
   }
 };
 
-const findMoviesBySearch = async (searchQuery: string, onlyCached: boolean): Promise<Movie[]> => {
-  try {
-    return prisma.movie.findMany({
-      where: {
-        queries: {
-          some: {
-            query: {
-              query: searchQuery,
-              ...(onlyCached && {
-                expiredAt: {
-                  gt: new Date(),
-                },
-              }),
-            },
-          },
-        },
-      },
-    });
-  } catch (error) {
-    throw new CustomError('Error occured during find movies by query search', error);
-  }
-};
-
 const findMoviesByQueryId = async (queryId: string): Promise<Movie[]> => {
   try {
     return prisma.movie.findMany({
@@ -200,7 +177,6 @@ const filterModifiedMovies = (moviesFromApi: Prisma.MovieUpdateInput[], moviesFr
 
 export const moviesService = {
   fetchExternalMovies,
-  findMoviesBySearch,
   findMoviesByQueryId,
   findMoviesByIds,
   putMovies,
