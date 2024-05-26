@@ -34,6 +34,9 @@ model Query {
   updatedAt       DateTime @updatedAt
   expiredAt       DateTime
   movies          QueriesOnMovies[]
+
+  @@index([query], name: "query_index")
+  @@index([expiredAt], name: "expired_at_index")
 }
 
 model QueriesOnMovies {
