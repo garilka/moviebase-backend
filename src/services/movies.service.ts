@@ -114,35 +114,36 @@ const findMoviesByQueryId = async (queryId: string): Promise<Movie[]> => {
   }
 };
 
+const findMoviesByIds = async (movieIds: number[]): Promise<Movie[]> => {
+  try {
+    return prisma.movie.findMany({
+      where: {
+        id: {
+          in: movieIds,
+        },
+      },
+    });
+  } catch (error) {
+    throw new CustomError('Error occured during find movies by ids', error);
+  }
+};
+
 const putMovies = async (externalMovies: ExternalMoviesResponse, query: string): Promise<number[]> => {
   try {
     const moviesFromApi = generateMoviesData(externalMovies);
-    const moviesFromDb = await findMoviesBySearch(query, false);
+    const moviesFromApiIds = moviesFromApi.map((movieFromApi) => movieFromApi.id);
 
-    const moviesFromDbIds = moviesFromDb.map((movie) => movie.id);
-    const moviesFromApiIds = moviesFromApi.map((movie) => movie.id);
+    const existingMovies = await findMoviesByIds(moviesFromApiIds);
+    const existingMovieIds = existingMovies.map((existingMovie) => existingMovie.id);
 
-    const { newMovies, existingMovies } = moviesFromApi.reduce(
-      (acc, movie) => {
-        if (moviesFromDbIds.includes(movie.id)) {
-          acc.existingMovies.push(movie);
-        } else {
-          acc.newMovies.push(movie);
-        }
-        return acc;
-      },
-      {
-        newMovies: [] as Prisma.MovieCreateInput[],
-        existingMovies: [] as Prisma.MovieUpdateInput[],
-      },
-    );
+    const newMovies = moviesFromApi.filter((movieFromApi) => !existingMovieIds.includes(movieFromApi.id));
 
     if (!isEmpty(newMovies)) {
       await createMovies(newMovies);
     }
 
     if (!isEmpty(existingMovies)) {
-      const modifiedMovies = filterModifiedMovies(existingMovies, moviesFromDb);
+      const modifiedMovies = filterModifiedMovies(moviesFromApi, existingMovies);
 
       if (!isEmpty(modifiedMovies)) {
         await updateMovies(modifiedMovies);
@@ -201,6 +202,7 @@ export const moviesService = {
   fetchExternalMovies,
   findMoviesBySearch,
   findMoviesByQueryId,
+  findMoviesByIds,
   putMovies,
   connectMoviesToQuery,
 };
