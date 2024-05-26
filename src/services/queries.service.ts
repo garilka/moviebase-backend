@@ -21,6 +21,48 @@ const createQuery = async ({ search, externalApiResponse }: CreateQueryInputs): 
   }
 };
 
+const findFirsQueryBySearch = async (searchQuery: string, onlyCached: boolean): Promise<Query | null> => {
+  try {
+    return prisma.query.findFirst({
+      where: {
+        query: searchQuery,
+        ...(onlyCached && {
+          expiredAt: {
+            gt: new Date(),
+          },
+        }),
+      },
+    });
+  } catch (error) {
+    throw new CustomError('Error occured during find first query by search', error);
+  }
+};
+
+const increaseCachedQueryHitCount = async (searchQuery: string): Promise<Query> => {
+  const queryInCache = await findFirsQueryBySearch(searchQuery, true);
+
+  if (!queryInCache) {
+    throw new Error('No unexpired query found with given searchQuery');
+  }
+
+  try {
+    return prisma.query.update({
+      where: {
+        id: queryInCache.id,
+      },
+      data: {
+        hitCount: {
+          increment: 1,
+        },
+      },
+    });
+  } catch (error) {
+    throw new CustomError('Error occured during increase query hit count', error);
+  }
+};
+
 export const queriesService = {
   createQuery,
+  findFirsQueryBySearch,
+  increaseCachedQueryHitCount,
 };

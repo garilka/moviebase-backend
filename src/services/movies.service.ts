@@ -72,14 +72,14 @@ const updateMovies = async (moviesToUpdate: Prisma.MovieUpdateInput[]): Promise<
   }
 };
 
-const findMoviesByQuery = async (query: string, onlyCached: boolean): Promise<Movie[]> => {
+const findMoviesBySearch = async (searchQuery: string, onlyCached: boolean): Promise<Movie[]> => {
   try {
     return prisma.movie.findMany({
       where: {
         queries: {
           some: {
             query: {
-              query,
+              query: searchQuery,
               ...(onlyCached && {
                 expiredAt: {
                   gt: new Date(),
@@ -91,14 +91,32 @@ const findMoviesByQuery = async (query: string, onlyCached: boolean): Promise<Mo
       },
     });
   } catch (error) {
-    throw new CustomError('Error occured during find movies by query', error);
+    throw new CustomError('Error occured during find movies by query search', error);
+  }
+};
+
+const findMoviesByQueryId = async (queryId: string): Promise<Movie[]> => {
+  try {
+    return prisma.movie.findMany({
+      where: {
+        queries: {
+          some: {
+            query: {
+              id: queryId,
+            },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    throw new CustomError('Error occured during find movies by query id', error);
   }
 };
 
 const putMovies = async (externalMovies: ExternalMoviesResponse, query: string): Promise<number[]> => {
   try {
     const moviesFromApi = generateMoviesData(externalMovies);
-    const moviesFromDb = await findMoviesByQuery(query, false);
+    const moviesFromDb = await findMoviesBySearch(query, false);
 
     const moviesFromDbIds = moviesFromDb.map((movie) => movie.id);
     const moviesFromApiIds = moviesFromApi.map((movie) => movie.id);
@@ -167,7 +185,8 @@ const filterModifiedMovies = (moviesFromApi: Prisma.MovieUpdateInput[], moviesFr
 
 export const moviesService = {
   fetchExternalMovies,
-  findMoviesByQuery,
+  findMoviesBySearch,
+  findMoviesByQueryId,
   putMovies,
   connectMoviesToQuery,
 };

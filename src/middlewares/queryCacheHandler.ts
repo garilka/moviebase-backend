@@ -7,10 +7,10 @@ export const queryCacheHandler = async (req: Request, _res: Response, next: Next
   try {
     if (req.path === `${config.baseUrl}/movies` && req.method === 'GET') {
       const search = req.query.search ? req.query.search.toString() : '';
-      const page = req.query.number ? +req.query.number : 1;
+      const page = req.query.page ? +req.query.page : 1;
 
       const queryString = generateQueryString(search, page);
-      const queryStringInCache = !!(await redisClient.get(queryString));
+      const queryStringInCache = await redisClient.get(queryString);
 
       if (queryStringInCache) {
         req.url = `${config.baseUrl}/movies/internal?${queryString}`;
