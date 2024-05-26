@@ -33,9 +33,9 @@ const getExternalMovies = async ({ search, page }: GetExternalMoviesProps) => {
 
     const externalApiResponse = await moviesService.fetchExternalMovies({ search, page });
 
-    const createdQuery = await queriesService.createQuery({ search, externalApiResponse });
-
     const createdOrUpdatedMovieIds = await moviesService.putMovies(externalApiResponse, query);
+
+    const createdQuery = await queriesService.createQuery({ search, externalApiResponse });
 
     await moviesService.connectMoviesToQuery(createdOrUpdatedMovieIds, createdQuery.id);
 

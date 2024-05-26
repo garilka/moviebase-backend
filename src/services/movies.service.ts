@@ -3,6 +3,7 @@ import lodash from 'lodash';
 import { config } from '../config/config.ts';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
+import { redisClient } from '../redisClient.ts';
 import { ExternalMoviesResponse } from '../types/movies.types';
 import { generateMoviesData } from '../utils/generateMoviesData.ts';
 
@@ -150,6 +151,19 @@ const putMovies = async (externalMovies: ExternalMoviesResponse, query: string):
 
     return moviesFromApiIds;
   } catch (error) {
+    // If an error occurs during the synchronization of movie data,
+    // we need to call an external fetch for the next occurrence of the same search query.
+    // The query won't be saved in the internal database in case of error, so we need to delete the cache as well.
+    const expiredAt = await redisClient.get(query);
+    const result = await redisClient.del(query);
+    if (result) {
+      console.log(
+        `Deleted ${query} query (Expires at ${expiredAt}) from Redis because of error during synchronization of movies`,
+      );
+    } else {
+      console.log(`Unable to delete ${query} query (Expires at ${expiredAt}) from Redis`);
+    }
+
     throw new CustomError('Error occured during put movies', error);
   }
 };
