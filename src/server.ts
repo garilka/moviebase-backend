@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import { config } from './config/config.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
@@ -12,6 +13,7 @@ const port: number = config.port;
   await redisClient.connect();
 })();
 
+app.use(cors(config.corsOptions));
 app.use(express.json());
 app.use(queryCacheHandler);
 

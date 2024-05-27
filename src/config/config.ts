@@ -6,4 +6,9 @@ export const config = {
   apiMovieBaseUrl: process.env.API_MOVIE_BASE_URL ?? 'https://api.themoviedb.org/3/search/movie',
   apiPosterBaseUrl: process.env.API_POSTER_BASE_URL ?? 'https://image.tmdb.org/t/p/w500',
   cacheMinute: process.env.CACHE_TIME_MINUTE ? +process.env.CACHE_TIME_MINUTE : 2,
+  corsOptions: {
+    origin: process.env.FRONTEND_BASE_URL ?? 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  },
 };
