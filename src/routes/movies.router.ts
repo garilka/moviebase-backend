@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { moviesController } from '../controllers/movies.controller.ts';
-import { InternalMovie } from '../types/movie.types.ts';
+import { InteralMoviesResponse } from '../types/movie.types.ts';
 import { ApiResponse } from '../types/response.type.ts';
 
 const moviesRouter = Router();
@@ -14,11 +14,11 @@ moviesRouter.get('/internal', async (req: Request, res: Response, next: NextFunc
     const search = req.query.search ? req.query.search.toString() : '';
     const page = req.query.page ? +req.query.page : 1;
 
-    const movies = await moviesController.getInternalMovies({ search, page });
+    const moviesWithMeta = await moviesController.getInternalMovies({ search, page });
 
-    const response: ApiResponse<(InternalMovie | undefined)[]> = {
+    const response: ApiResponse<InteralMoviesResponse> = {
       message: 'Movies fetched from internal database',
-      data: movies,
+      data: moviesWithMeta,
     };
 
     res.status(200).json(response);
@@ -32,11 +32,11 @@ moviesRouter.get('/external', async (req: Request, res: Response, next: NextFunc
     const search = req.query.search ? req.query.search.toString() : '';
     const page = req.query.page ? +req.query.page : 1;
 
-    const movies = await moviesController.getExternalMovies({ search, page });
+    const moviesWithMeta = await moviesController.getExternalMovies({ search, page });
 
-    const response: ApiResponse<(InternalMovie | undefined)[]> = {
+    const response: ApiResponse<InteralMoviesResponse> = {
       message: 'Movies fetched from 3rd parti API',
-      data: movies,
+      data: moviesWithMeta,
     };
 
     res.status(200).json(response);

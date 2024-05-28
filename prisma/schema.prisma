@@ -26,8 +26,8 @@ model Query {
   id              String @id @default(uuid())
   search          String
   page            Int
-  pageCount       Int?
-  resultCount     Int?
+  pageCount       Int
+  resultCount     Int
   hitCount        Int @default(0)
   query           String
   createdAt       DateTime @default(now())

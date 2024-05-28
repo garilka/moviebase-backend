@@ -2,6 +2,7 @@ import { Query } from '@prisma/client';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
 import { ExternalMoviesResponse } from '../types/movie.types.ts';
+import { SearchMeta } from '../types/query.types.ts';
 import { generateQueryData } from '../utils/generateQueryData.ts';
 
 type CreateQueryInputs = {
@@ -38,6 +39,22 @@ const findFirsQueryBySearch = async (searchQuery: string, onlyCached: boolean): 
   }
 };
 
+const findSearchMetaByQueryId = async (queryId: string): Promise<SearchMeta> => {
+  try {
+    return prisma.query.findUniqueOrThrow({
+      where: {
+        id: queryId,
+      },
+      select: {
+        pageCount: true,
+        resultCount: true,
+      },
+    });
+  } catch (error) {
+    throw new CustomError('Error occured during find page count by query id', error);
+  }
+};
+
 const increaseCachedQueryHitCount = async (searchQuery: string): Promise<Query> => {
   const queryInCache = await findFirsQueryBySearch(searchQuery, true);
 
@@ -64,5 +81,6 @@ const increaseCachedQueryHitCount = async (searchQuery: string): Promise<Query> 
 export const queriesService = {
   createQuery,
   findFirsQueryBySearch,
+  findSearchMetaByQueryId,
   increaseCachedQueryHitCount,
 };

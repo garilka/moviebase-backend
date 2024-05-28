@@ -1,25 +1,27 @@
 import { CustomError } from '../errors/customErrorClass.ts';
 import { moviesService } from '../services/movies.service.ts';
 import { queriesService } from '../services/queries.service.ts';
-import { InternalMovie } from '../types/movie.types.ts';
+import { InteralMoviesResponse } from '../types/movie.types.ts';
 import { QueryParams } from '../types/query.types.ts';
 import { generateQueryString } from '../utils/generateQueryString.ts';
 
-const getInternalMovies = async ({ search, page }: QueryParams): Promise<(InternalMovie | undefined)[]> => {
+const getInternalMovies = async ({ search, page }: QueryParams): Promise<InteralMoviesResponse> => {
   try {
     const queryString = generateQueryString(search, page);
 
     const query = await queriesService.increaseCachedQueryHitCount(queryString);
 
-    const moviesByQueryId = await moviesService.findMoviesByQueryId(query.id);
+    const movies = await moviesService.findMoviesByQueryId(query.id);
 
-    return moviesByQueryId;
+    const searchMeta = await queriesService.findSearchMetaByQueryId(query.id);
+
+    return { meta: searchMeta, movies: movies };
   } catch (error) {
     throw new CustomError('Error occured during get movies from internal database', error);
   }
 };
 
-const getExternalMovies = async ({ search, page }: QueryParams): Promise<(InternalMovie | undefined)[]> => {
+const getExternalMovies = async ({ search, page }: QueryParams): Promise<InteralMoviesResponse> => {
   try {
     const query = generateQueryString(search, page);
 
@@ -31,9 +33,11 @@ const getExternalMovies = async ({ search, page }: QueryParams): Promise<(Intern
 
     await moviesService.connectMoviesToQuery(createdOrUpdatedMovieIds, createdQuery.id);
 
-    const moviesByQueryId = await moviesService.findMoviesByQueryId(createdQuery.id);
+    const movies = await moviesService.findMoviesByQueryId(createdQuery.id);
 
-    return moviesByQueryId;
+    const searchMeta = await queriesService.findSearchMetaByQueryId(createdQuery.id);
+
+    return { meta: searchMeta, movies: movies };
   } catch (error) {
     throw new CustomError('Error occured during get movies from external API', error);
   }

@@ -1,10 +1,5 @@
 import { Decimal } from '@prisma/client/runtime/library';
-
-export type ExternalMeta = {
-  page: number;
-  total_pages: number;
-  total_results: number;
-};
+import { ExternalSearchMeta, SearchMeta } from './query.types';
 
 export type ExternalMovie = {
   id: string;
@@ -18,7 +13,7 @@ export type ExternalMovie = {
   [key: string]: any;
 };
 
-export type ExternalMoviesResponse = ExternalMeta & { results: ExternalMovie[] };
+export type ExternalMoviesResponse = ExternalSearchMeta & { results: ExternalMovie[] };
 
 export type InternalMovie = {
   id: number;
@@ -29,3 +24,5 @@ export type InternalMovie = {
   originalTitle?: string | null;
   posterUrl?: string | null;
 };
+
+export type InteralMoviesResponse = { meta: SearchMeta } & { movies: InternalMovie[] };
