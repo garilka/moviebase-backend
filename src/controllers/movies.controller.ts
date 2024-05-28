@@ -1,7 +1,7 @@
 import { CustomError } from '../errors/customErrorClass.ts';
 import { moviesService } from '../services/movies.service.ts';
 import { queriesService } from '../services/queries.service.ts';
-import { InternalMovie } from '../types/movies.types.ts';
+import { InternalMovie } from '../types/movie.types.ts';
 import { QueryParams } from '../types/query.types.ts';
 import { generateQueryString } from '../utils/generateQueryString.ts';
 

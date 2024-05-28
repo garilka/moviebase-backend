@@ -1,7 +1,7 @@
 import { Query } from '@prisma/client';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
-import { ExternalMoviesResponse } from '../types/movies.types.ts';
+import { ExternalMoviesResponse } from '../types/movie.types.ts';
 import { generateQueryData } from '../utils/generateQueryData.ts';
 
 type CreateQueryInputs = {

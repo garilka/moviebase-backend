@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { ExternalMoviesResponse } from '../types/movies.types.ts';
+import { ExternalMoviesResponse } from '../types/movie.types.ts';
 import { convertToValidStringDate } from './convertToValidDate.ts';
 import { generatePosterUrl } from './generatePosterUrl.ts';
 

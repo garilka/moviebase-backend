@@ -1,5 +1,5 @@
 import { redisClient } from '../redisClient.ts';
-import { ExternalMoviesResponse } from '../types/movies.types.ts';
+import { ExternalMoviesResponse } from '../types/movie.types.ts';
 import { generateQueryString } from './generateQueryString.ts';
 
 export const generateQueryData = async (

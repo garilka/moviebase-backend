@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { moviesController } from '../controllers/movies.controller.ts';
-import { InternalMovie } from '../types/movies.types.ts';
+import { InternalMovie } from '../types/movie.types.ts';
 import { ApiResponse } from '../types/response.type.ts';
 
 const moviesRouter = Router();

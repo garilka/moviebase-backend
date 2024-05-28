@@ -4,7 +4,7 @@ import { config } from '../config/config.ts';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
 import { redisClient } from '../redisClient.ts';
-import { ExternalMoviesResponse, InternalMovie } from '../types/movies.types';
+import { ExternalMoviesResponse, InternalMovie } from '../types/movie.types.ts';
 import { generateMoviesData } from '../utils/generateMoviesData.ts';
 
 const { isEmpty, isEqual } = lodash;
