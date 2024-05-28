@@ -1,19 +1,11 @@
 import { CustomError } from '../errors/customErrorClass.ts';
 import { moviesService } from '../services/movies.service.ts';
 import { queriesService } from '../services/queries.service.ts';
+import { InternalMovie } from '../types/movies.types.ts';
+import { QueryParams } from '../types/query.types.ts';
 import { generateQueryString } from '../utils/generateQueryString.ts';
 
-type GetInternalMoviesProps = {
-  search: string;
-  page?: number;
-};
-
-type GetExternalMoviesProps = {
-  search: string;
-  page?: number;
-};
-
-const getInternalMovies = async ({ search, page }: GetInternalMoviesProps) => {
+const getInternalMovies = async ({ search, page }: QueryParams): Promise<(InternalMovie | undefined)[]> => {
   try {
     const queryString = generateQueryString(search, page);
 
@@ -27,7 +19,7 @@ const getInternalMovies = async ({ search, page }: GetInternalMoviesProps) => {
   }
 };
 
-const getExternalMovies = async ({ search, page }: GetExternalMoviesProps) => {
+const getExternalMovies = async ({ search, page }: QueryParams): Promise<(InternalMovie | undefined)[]> => {
   try {
     const query = generateQueryString(search, page);
 

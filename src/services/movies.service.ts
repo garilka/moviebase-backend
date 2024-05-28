@@ -4,7 +4,7 @@ import { config } from '../config/config.ts';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
 import { redisClient } from '../redisClient.ts';
-import { ExternalMoviesResponse } from '../types/movies.types';
+import { ExternalMoviesResponse, InternalMovie } from '../types/movies.types';
 import { generateMoviesData } from '../utils/generateMoviesData.ts';
 
 const { isEmpty, isEqual } = lodash;
@@ -73,7 +73,7 @@ const updateMovies = async (moviesToUpdate: Prisma.MovieUpdateInput[]): Promise<
   }
 };
 
-const findMoviesByQueryId = async (queryId: string): Promise<Movie[]> => {
+const findMoviesByQueryId = async (queryId: string): Promise<InternalMovie[]> => {
   try {
     return prisma.movie.findMany({
       where: {
@@ -84,6 +84,15 @@ const findMoviesByQueryId = async (queryId: string): Promise<Movie[]> => {
             },
           },
         },
+      },
+      select: {
+        id: true,
+        title: true,
+        releaseDate: true,
+        overview: true,
+        voteAverage: true,
+        originalTitle: true,
+        posterUrl: true,
       },
     });
   } catch (error) {

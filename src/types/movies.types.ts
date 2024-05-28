@@ -1,3 +1,5 @@
+import { Decimal } from '@prisma/client/runtime/library';
+
 export type ExternalMeta = {
   page: number;
   total_pages: number;
@@ -17,3 +19,13 @@ export type ExternalMovie = {
 };
 
 export type ExternalMoviesResponse = ExternalMeta & { results: ExternalMovie[] };
+
+export type InternalMovie = {
+  id: number;
+  title: string;
+  releaseDate?: Date | null;
+  overview?: string | null;
+  voteAverage?: Decimal | null;
+  originalTitle?: string | null;
+  posterUrl?: string | null;
+};

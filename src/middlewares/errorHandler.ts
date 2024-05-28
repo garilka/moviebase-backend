@@ -10,5 +10,5 @@ export const errorHandler = (error: any, _req: Request, res: Response, _next: Ne
 
   const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
 
-  res.status(500).json({ message: errorMessage });
+  res.status(500).json({ message: errorMessage, data: [] });
 };
