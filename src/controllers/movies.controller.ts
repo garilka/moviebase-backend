@@ -1,4 +1,6 @@
+import { Prisma } from '@prisma/client';
 import { CustomError } from '../errors/customErrorClass.ts';
+import { prisma } from '../prismaClient.ts';
 import { moviesService } from '../services/movies.service.ts';
 import { queriesService } from '../services/queries.service.ts';
 import { InteralMoviesResponse } from '../types/movie.types.ts';
@@ -27,15 +29,19 @@ const getExternalMovies = async ({ search, page }: QueryParams): Promise<Interal
 
     const externalApiResponse = await moviesService.fetchExternalMovies({ search, page });
 
-    const createdOrUpdatedMovieIds = await moviesService.putMovies(externalApiResponse, query);
+    const createdQueryId = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const createdOrUpdatedMovieIds = await moviesService.putMovies(externalApiResponse, query, tx);
 
-    const createdQuery = await queriesService.createQuery({ search, externalApiResponse });
+      const createdQuery = await queriesService.createQuery({ search, externalApiResponse });
 
-    await moviesService.connectMoviesToQuery(createdOrUpdatedMovieIds, createdQuery.id);
+      await moviesService.connectMoviesToQuery(createdOrUpdatedMovieIds, createdQuery.id, tx);
 
-    const movies = await moviesService.findMoviesByQueryId(createdQuery.id);
+      return createdQuery.id;
+    });
 
-    const searchMeta = await queriesService.findSearchMetaByQueryId(createdQuery.id);
+    const movies = await moviesService.findMoviesByQueryId(createdQueryId);
+
+    const searchMeta = await queriesService.findSearchMetaByQueryId(createdQueryId);
 
     return { meta: searchMeta, movies: movies };
   } catch (error) {

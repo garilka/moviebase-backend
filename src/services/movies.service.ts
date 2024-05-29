@@ -38,9 +38,12 @@ const fetchExternalMovies = async ({ search, page = 1 }: FetchExternalMoviesProp
   }
 };
 
-const createMovies = async (newMovies: Prisma.MovieCreateInput[]): Promise<{ count: number }> => {
+const createMovies = async (
+  newMovies: Prisma.MovieCreateInput[],
+  tx: Prisma.TransactionClient,
+): Promise<{ count: number }> => {
   try {
-    return prisma.movie.createMany({
+    return tx.movie.createMany({
       data: newMovies,
     });
   } catch (error) {
@@ -48,13 +51,13 @@ const createMovies = async (newMovies: Prisma.MovieCreateInput[]): Promise<{ cou
   }
 };
 
-const updateMovie = async (existingMovie: Prisma.MovieUpdateInput): Promise<Movie> => {
+const updateMovie = async (existingMovie: Prisma.MovieUpdateInput, tx: Prisma.TransactionClient): Promise<Movie> => {
   try {
     if (!existingMovie?.id) {
       throw new Error('Movie not exists in database with given id');
     }
 
-    return prisma.movie.update({
+    return tx.movie.update({
       where: {
         id: +existingMovie.id,
       },
@@ -65,9 +68,12 @@ const updateMovie = async (existingMovie: Prisma.MovieUpdateInput): Promise<Movi
   }
 };
 
-const updateMovies = async (moviesToUpdate: Prisma.MovieUpdateInput[]): Promise<Movie[]> => {
+const updateMovies = async (
+  moviesToUpdate: Prisma.MovieUpdateInput[],
+  tx: Prisma.TransactionClient,
+): Promise<Movie[]> => {
   try {
-    return Promise.all(moviesToUpdate.map((movie) => updateMovie(movie)));
+    return Promise.all(moviesToUpdate.map((movie) => updateMovie(movie, tx)));
   } catch (error) {
     throw new CustomError('Error occured during update movies', error);
   }
@@ -114,7 +120,11 @@ const findMoviesByIds = async (movieIds: number[]): Promise<Movie[]> => {
   }
 };
 
-const putMovies = async (externalMovies: ExternalMoviesResponse, query: string): Promise<number[]> => {
+const putMovies = async (
+  externalMovies: ExternalMoviesResponse,
+  query: string,
+  tx: Prisma.TransactionClient,
+): Promise<number[]> => {
   try {
     const moviesFromApi = generateMoviesData(externalMovies);
     const moviesFromApiIds = moviesFromApi.map((movieFromApi) => movieFromApi.id);
@@ -125,14 +135,14 @@ const putMovies = async (externalMovies: ExternalMoviesResponse, query: string):
     const newMovies = moviesFromApi.filter((movieFromApi) => !existingMovieIds.includes(movieFromApi.id));
 
     if (!isEmpty(newMovies)) {
-      await createMovies(newMovies);
+      await createMovies(newMovies, tx);
     }
 
     if (!isEmpty(existingMovies)) {
       const modifiedMovies = filterModifiedMovies(moviesFromApi, existingMovies);
 
       if (!isEmpty(modifiedMovies)) {
-        await updateMovies(modifiedMovies);
+        await updateMovies(modifiedMovies, tx);
       }
     }
 
@@ -155,11 +165,11 @@ const putMovies = async (externalMovies: ExternalMoviesResponse, query: string):
   }
 };
 
-const connectMoviesToQuery = async (moviedIds: number[], queryId: string) => {
+const connectMoviesToQuery = async (moviedIds: number[], queryId: string, tx: Prisma.TransactionClient) => {
   try {
     const connections = moviedIds.map((movieId) => ({ movieId, queryId }));
 
-    await prisma.queriesOnMovies.createMany({
+    await tx.queriesOnMovies.createMany({
       data: connections,
     });
   } catch (error) {
