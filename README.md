@@ -1,6 +1,8 @@
 # moviebase-backend
 
-Backend setup
+#### Movie database search application with 3rd party data sync and load measurement
+
+## Setup
 
 0. Clone this repository
 
@@ -36,16 +38,16 @@ Backend setup
 
 ℹ️ If you run this command outside the moviebase-backend repository the script won't be able to load the .env
 
-5. Create Prisma client
-
-```
-   npx prisma generate
-```
-
-6. Create database schema with Prisma migration
+5. Create database schema with Prisma migration
 
 ```
    npx prisma migrate dev
+```
+
+6. Generate Prisma client
+
+```
+   npx prisma generate
 ```
 
 7. Start the backend server 🚀
