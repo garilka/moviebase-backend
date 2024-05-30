@@ -1,9 +1,12 @@
 import { Query } from '@prisma/client';
+import { config } from '../config/config.ts';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
+import { redisClient } from '../redisClient.ts';
 import { ExternalMoviesResponse } from '../types/movie.types.ts';
 import { SearchMeta } from '../types/query.types.ts';
 import { generateQueryData } from '../utils/generateQueryData.ts';
+import { generateQueryString } from '../utils/generateQueryString.ts';
 
 type CreateQueryInputs = {
   search: string;
@@ -78,9 +81,24 @@ const increaseCachedQueryHitCount = async (searchQuery: string): Promise<Query> 
   }
 };
 
+const cacheQuery = async (search: string, expiredAt: Date, page?: number) => {
+  const queryString = generateQueryString(search, page);
+  const cacheTimeInSeconds = config.cacheMinute * 60;
+  const expiredAtString = expiredAt.toISOString();
+
+  const cached = await redisClient.set(queryString, expiredAtString, { EX: cacheTimeInSeconds });
+
+  if (cached) {
+    console.log(`Cached ${queryString} query in Redis for ${cacheTimeInSeconds} seconds (Expires at ${expiredAt})`);
+  } else {
+    console.error(`Unabled to cache ${queryString} query in Redis (${new Date().toISOString})`);
+  }
+};
+
 export const queriesService = {
   createQuery,
   findFirsQueryBySearch,
   findSearchMetaByQueryId,
   increaseCachedQueryHitCount,
+  cacheQuery,
 };

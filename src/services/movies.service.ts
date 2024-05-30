@@ -3,18 +3,13 @@ import lodash from 'lodash';
 import { config } from '../config/config.ts';
 import { CustomError } from '../errors/customErrorClass.ts';
 import { prisma } from '../prismaClient.ts';
-import { redisClient } from '../redisClient.ts';
 import { ExternalMoviesResponse, InternalMovie } from '../types/movie.types.ts';
+import { QueryParams } from '../types/query.types.ts';
 import { generateMoviesData } from '../utils/generateMoviesData.ts';
 
 const { isEmpty, isEqual } = lodash;
 
-type FetchExternalMoviesProps = {
-  search: string;
-  page?: number;
-};
-
-const fetchExternalMovies = async ({ search, page = 1 }: FetchExternalMoviesProps): Promise<ExternalMoviesResponse> => {
+const fetchExternalMovies = async ({ search, page = 1 }: QueryParams): Promise<ExternalMoviesResponse> => {
   const url = `${config.apiMovieBaseUrl}?api_key=${process.env.API_KEY_AUTH}&query=${search}&page=${page}`;
 
   const options = {
@@ -148,19 +143,6 @@ const putMovies = async (
 
     return moviesFromApiIds;
   } catch (error) {
-    // If an error occurs during the synchronization of movie data,
-    // we need to call an external fetch for the next occurrence of the same search query.
-    // The query won't be saved in the internal database in case of error, so we need to delete the cache as well.
-    const expiredAt = await redisClient.get(query);
-    const result = await redisClient.del(query);
-    if (result) {
-      console.log(
-        `Deleted ${query} query (Expires at ${expiredAt}) from Redis because of error during synchronization of movies`,
-      );
-    } else {
-      console.log(`Unable to delete ${query} query (Expires at ${expiredAt}) from Redis`);
-    }
-
     throw new CustomError('Error occured during put movies', error);
   }
 };

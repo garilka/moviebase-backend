@@ -1,4 +1,4 @@
-import { redisClient } from '../redisClient.ts';
+import { config } from '../config/config.ts';
 import { ExternalMoviesResponse } from '../types/movie.types.ts';
 import { generateQueryString } from './generateQueryString.ts';
 
@@ -9,14 +9,15 @@ export const generateQueryData = async (
 ) => {
   const { page, total_pages, total_results } = externalMoviesResponse;
   const searchQuery = generateQueryString(search, page);
-  const expiredAt = await redisClient.get(searchQuery);
+  const currentDate = new Date();
+  const expiredAt = new Date(currentDate.getTime() + config.cacheMinute * 60000).toISOString();
 
   return {
     search,
     page,
     pageCount: total_pages,
     resultCount: total_results,
-    query: generateQueryString(search, page),
-    expiredAt: expiredAt!,
+    query: searchQuery,
+    expiredAt: expiredAt,
   };
 };
