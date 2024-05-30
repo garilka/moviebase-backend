@@ -7,51 +7,57 @@
 0. Clone this repository
 
 ```
-   git clone https://github.com/garilka/moviebase-backend.git
+git clone https://github.com/garilka/moviebase-backend.git
 ```
 
 1. Go to the repository
 
 ```
-   cd moviebase-backend
+cd moviebase-backend
 ```
 
-1. Use project node version
+2. Use project node version
 
 ```
-   nvm use
+nvm use
 ```
 
-2. Install dependecies
+3. Install dependecies
 
 ```
-   npm i
+npm i
 ```
 
-3. Create .env based on .env.example
+4. Create .env based on .env.example
 
-4. Create Postgresql docker container based on .env
+5. Create Postgresql docker container based on .env
 
 ```
-   export $(grep -v '^#' .env | xargs) && docker run -d --name postgresMoviebaseContainer -p $DB_PORT:5432 -e POSTGRES_PASSWORD=$DB_PASSWORD postgres
+export $(grep -v '^#' .env | xargs) && docker run -d --name postgresMoviebaseContainer -p $DB_PORT:5432 -e POSTGRES_PASSWORD=$DB_PASSWORD postgres
 ```
 
 ℹ️ If you run this command outside the moviebase-backend repository the script won't be able to load the .env
 
-5. Create database schema with Prisma migration
+6. Create database schema with Prisma migration
 
 ```
-   npx prisma migrate dev
+npx prisma migrate dev
 ```
 
-6. Generate Prisma client
+7. Generate Prisma client
 
 ```
-   npx prisma generate
+npx prisma generate
 ```
 
-7. Start the backend server 🚀
+8. Create Redis container
 
 ```
-   npm start
+export $(grep -v '^#' .env | xargs) && docker run -d --name redisMoviebase -p $REDIS_PORT:6379 -it redis/redis-stack-server:latest
+```
+
+9. Start the backend server 🚀
+
+```
+npm start
 ```

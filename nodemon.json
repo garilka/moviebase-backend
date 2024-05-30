@@ -1,6 +1,6 @@
 {
   "execMap": {
-    "ts": "node --import=ts-node/esm-register"
+    "ts": "node --loader ts-node/esm.mjs"
   },
   "ext": "ts"
 }
