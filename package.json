@@ -4,7 +4,6 @@
     "start": "concurrently \"redis-server\" \"nodemon --env-file=.env ./src/server.ts\"",
     "start redis": "redis-server",
     "stop redis": "redis-cli shutdown",
-    "postinstall": "patch-package",
     "test": "jest"
   },
   "dependencies": {
