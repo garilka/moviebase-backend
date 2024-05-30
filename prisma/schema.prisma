@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model Movie {
+  id              Int @id @unique
+  title           String
+  originalTitle   String?
+  overview        String?
+  posterUrl       String?
+  releaseDate     DateTime?
+  genreIds        Int[]
+  voteAverage     Decimal?
+  rawData         Json
+  createdAt       DateTime @default(now())
+  updateAt        DateTime @updatedAt
+  queries         QueriesOnMovies[]
+}
+
+model Query {
+  id              String @id @default(uuid())
+  search          String
+  page            Int
+  pageCount       Int
+  resultCount     Int
+  hitCount        Int @default(0)
+  query           String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  expiredAt       DateTime
+  movies          QueriesOnMovies[]
+
+  @@index([query], name: "query_index")
+  @@index([expiredAt], name: "expired_at_index")
+}
+
+model QueriesOnMovies {
+  movie           Movie @relation(fields: [movieId], references: [id])
+  movieId         Int
+  query           Query @relation(fields: [queryId], references: [id])
+  queryId         String
+
+  @@id([movieId, queryId])
+}
